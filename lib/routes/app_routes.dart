@@ -1,3 +1,4 @@
+import 'package:ecommerce_app/features/auth/ui/forgot_password.dart';
 import 'package:ecommerce_app/features/auth/ui/register_screen.dart';
 import 'package:go_router/go_router.dart';
 import '../features/auth/ui/splash_screen.dart';
@@ -9,10 +10,14 @@ final GoRouter router = GoRouter(
   routes: [
     GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
     GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
-    GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
     ),
+    GoRoute(
+      path: '/forgot-password',
+      builder: (context, state) => const ForgotPasswordScreen(),
+    ),
+    GoRoute(path: '/home', builder: (context, state) => const HomeScreen()),
   ],
 );

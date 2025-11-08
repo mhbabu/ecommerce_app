@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart'; // <-- ADD THIS
+import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_textfield.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/text_styles.dart';
 import '../../../core/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -25,7 +27,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     setState(() => _isLoading = true);
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
     final success = await authProvider.register({
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
@@ -34,11 +35,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     setState(() => _isLoading = false);
 
+    if (!mounted) return;
+
     if (success) {
-      context.go('/verify-email'); // Navigate to email verification
+      context.go('/verify-email');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration failed! Please try again.')),
+        const SnackBar(content: Text('Registration failed! Try again.')),
       );
     }
   }
@@ -68,83 +71,44 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Name Field
-                TextFormField(
+                AppTextField(
                   controller: _nameController,
-                  decoration: InputDecoration(
-                    labelText: 'Full Name',
-                    prefixIcon: const Icon(Icons.person),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter your name' : null,
+                  label: 'Full Name',
+                  prefixIcon: const Icon(Icons.person),
+                  validator: (v) => v!.isEmpty ? 'Enter name' : null,
                 ),
                 const SizedBox(height: 16),
 
-                // Email Field
-                TextFormField(
+                AppTextField(
                   controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  label: 'Email',
+                  prefixIcon: const Icon(Icons.email),
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter your email' : null,
+                  validator: (v) => v!.isEmpty ? 'Enter email' : null,
                 ),
                 const SizedBox(height: 16),
 
-                // Password Field
-                TextFormField(
+                AppTextField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  label: 'Password',
+                  prefixIcon: const Icon(Icons.lock),
                   obscureText: true,
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter password' : null,
+                  validator: (v) => v!.isEmpty ? 'Enter password' : null,
                 ),
                 const SizedBox(height: 24),
 
-                // Register Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _register,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            'Register',
-                            style: AppTextStyles.mediumTitle.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
+                AppButton(
+                  text: _isLoading ? 'Loading...' : 'Register',
+                  onPressed: _isLoading ? null : _register,
                 ),
-
                 const SizedBox(height: 16),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text("Already have an account? "),
                     GestureDetector(
-                      onTap: () => context.go('/login'), // <- works now
+                      onTap: () => context.go('/login'),
                       child: Text(
                         'Login',
                         style: AppTextStyles.mediumTitle.copyWith(

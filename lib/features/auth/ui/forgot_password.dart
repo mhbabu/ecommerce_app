@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_textfield.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/text_styles.dart';
 import '../../../core/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -16,25 +19,25 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
 
-  void _resetPassword() async {
+  void _sendResetLink() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
-
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final success = await authProvider.forgotPassword(
       _emailController.text.trim(),
     );
-
     setState(() => _isLoading = false);
+
+    if (!mounted) return;
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          success ? 'Reset link sent to your email' : 'Failed! Try again.',
-        ),
+        content: Text(success ? 'Reset link sent!' : 'Failed to send link.'),
       ),
     );
+
+    if (success) context.go('/login');
   }
 
   @override
@@ -60,49 +63,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     color: AppColors.primary,
                   ),
                 ),
-                const SizedBox(height: 16),
-                Text(
-                  'Enter your email to receive password reset instructions.',
-                  style: AppTextStyles.body,
-                  textAlign: TextAlign.center,
-                ),
                 const SizedBox(height: 32),
 
-                // Email
-                TextFormField(
+                AppTextField(
                   controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter your email' : null,
+                  label: 'Email',
+                  prefixIcon: const Icon(Icons.email),
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) => v!.isEmpty ? 'Enter email' : null,
                 ),
                 const SizedBox(height: 24),
 
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _resetPassword,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            'Send Reset Link',
-                            style: AppTextStyles.mediumTitle.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
+                AppButton(
+                  text: _isLoading ? 'Sending...' : 'Send Reset Link',
+                  onPressed: _isLoading ? null : _sendResetLink,
                 ),
               ],
             ),

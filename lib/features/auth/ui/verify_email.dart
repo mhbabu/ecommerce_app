@@ -1,36 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/text_styles.dart';
-import '../../../core/providers/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
-class VerifyEmailScreen extends StatefulWidget {
+class VerifyEmailScreen extends StatelessWidget {
   const VerifyEmailScreen({super.key});
-
-  @override
-  State<VerifyEmailScreen> createState() => _VerifyEmailScreenState();
-}
-
-class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
-  bool _isLoading = false;
-
-  void _verifyEmail() async {
-    setState(() => _isLoading = true);
-
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    final success = await authProvider.verifyEmail();
-
-    setState(() => _isLoading = false);
-
-    if (success) {
-      context.go('/home'); // After verification go to home
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Verification failed! Please try again.')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,45 +16,16 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                Icons.mark_email_read_rounded,
-                size: 100,
-                color: AppColors.primary,
-              ),
+              Icon(Icons.email, size: 100, color: AppColors.primary),
               const SizedBox(height: 16),
-              Text(
-                'Verify Your Email',
-                style: AppTextStyles.bigTitle.copyWith(
-                  color: AppColors.primary,
-                ),
-              ),
+              Text('Verify Your Email', style: AppTextStyles.bigTitle.copyWith(color: AppColors.primary)),
               const SizedBox(height: 16),
-              Text(
-                'We have sent a verification link to your email. Please check and verify to continue.',
-                style: AppTextStyles.body,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _verifyEmail,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : Text(
-                          'I have Verified',
-                          style: AppTextStyles.mediumTitle.copyWith(
-                            color: Colors.white,
-                          ),
-                        ),
-                ),
+              const Text('A verification link has been sent to your email. Please check and verify to continue.', textAlign: TextAlign.center),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: () => context.go('/login'),
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                child: const Text('Back to Login', style: TextStyle(color: Colors.white)),
               ),
             ],
           ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_textfield.dart';
 import '../../../core/constants/colors.dart';
 import '../../../core/constants/text_styles.dart';
 import '../../../core/providers/auth_provider.dart';
@@ -24,8 +26,6 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    // Call your login function in AuthProvider
     final success = await authProvider.login(
       _emailController.text.trim(),
       _passwordController.text.trim(),
@@ -33,14 +33,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
     setState(() => _isLoading = false);
 
+    if (!mounted) return;
+
     if (success) {
-      // Navigate to Home Screen
       context.go('/home');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login failed! Please check your credentials.'),
-        ),
+        const SnackBar(content: Text('Login failed! Check credentials.')),
       );
     }
   }
@@ -71,63 +70,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Email Field
-                TextFormField(
+                AppTextField(
                   controller: _emailController,
-                  decoration: InputDecoration(
-                    labelText: 'Email',
-                    prefixIcon: const Icon(Icons.email),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  label: 'Email',
+                  prefixIcon: const Icon(Icons.email),
                   keyboardType: TextInputType.emailAddress,
-                  validator: (value) =>
-                      value!.isEmpty ? 'Please enter your email' : null,
+                  validator: (value) => value!.isEmpty ? 'Enter email' : null,
                 ),
                 const SizedBox(height: 16),
 
-                // Password Field
-                TextFormField(
+                AppTextField(
                   controller: _passwordController,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    prefixIcon: const Icon(Icons.lock),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
+                  label: 'Password',
+                  prefixIcon: const Icon(Icons.lock),
                   obscureText: true,
                   validator: (value) =>
-                      value!.isEmpty ? 'Please enter your password' : null,
+                      value!.isEmpty ? 'Enter password' : null,
                 ),
                 const SizedBox(height: 24),
 
-                // Login Button
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _login,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const CircularProgressIndicator(color: Colors.white)
-                        : Text(
-                            'Login',
-                            style: AppTextStyles.mediumTitle.copyWith(
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
+                AppButton(
+                  text: _isLoading ? 'Loading...' : 'Login',
+                  onPressed: _isLoading ? null : _login,
                 ),
                 const SizedBox(height: 16),
 
-                // Register Link
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -142,6 +109,16 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ],
+                ),
+                const SizedBox(height: 8),
+                GestureDetector(
+                  onTap: () => context.go('/forgot-password'),
+                  child: Text(
+                    'Forgot Password?',
+                    style: AppTextStyles.mediumTitle.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
                 ),
               ],
             ),
